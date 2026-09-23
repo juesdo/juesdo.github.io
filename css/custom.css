@@ -296,3 +296,35 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 #waifu {
   z-index: 999 !important;
 }
+/* ==========================================================================
+   �鵵����ǩ������ҳ�沣��̬��Ƭ����
+   ========================================================================== */
+#archive, #tag, #category {
+  background: rgba(8, 13, 26, 0.6) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+}
+
+[data-theme="light"] #archive,
+[data-theme="light"] #tag,
+[data-theme="light"] #category {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* ����������ɫ */
+#archive .article-sort-item-title, 
+#archive .article-sort-title,
+#archive .article-sort-item-time time {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="light"] #archive .article-sort-item-title, 
+[data-theme="light"] #archive .article-sort-title,
+[data-theme="light"] #archive .article-sort-item-time time {
+  color: #333 !important;
+}

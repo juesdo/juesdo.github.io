@@ -65,7 +65,12 @@
 
     if (!container) {
       const path = window.location.pathname;
-      if (path.includes('/about/') || path.includes('/link/')) {
+      const isFixedPage = path.includes('/about/') || 
+                          path.includes('/link/') || 
+                          path.includes('/archives/') || 
+                          path.includes('/tags/') || 
+                          path.includes('/categories/');
+      if (isFixedPage) {
         container = document.getElementById('fixed-bg-container');
         if (!container) {
           container = document.createElement('div');
