@@ -328,3 +328,5 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 [data-theme="light"] #archive .article-sort-item-time time {
   color: #333 !important;
 }
+
+#footer { display: none !important; }
