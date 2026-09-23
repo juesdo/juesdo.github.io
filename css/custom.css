@@ -1,0 +1,298 @@
+/* ==========================================================================
+   Fira Code 等宽代码字体
+   ========================================================================== */
+code, pre, pre code, .highlight, .highlight code, .codehilite {
+  font-family: 'Fira Code', 'Cascadia Code', Consolas, Monaco, 'Courier New', monospace !important;
+}
+
+/* ==========================================================================
+   首页 Hero 轮播壁纸双层平滑过渡 (Hero Wallpaper Carousel)
+   ========================================================================== */
+#page-header.full_page {
+  position: relative;
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+.hero-bg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 0 !important;
+}
+
+#page-header.full_page::before {
+  z-index: 1 !important;
+}
+
+#site-info,
+#scroll-down,
+#nav {
+  position: relative;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   侧边栏社交二维码悬浮卡片 (Social QR Tooltips)
+   ========================================================================== */
+.card-info-social-icons .social-icon {
+  position: relative !important;
+}
+
+.social-qr-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--style-border, #e3e8f7);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+[data-theme="dark"] .social-qr-tooltip {
+  background: #1e1e24;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.social-qr-tooltip img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.social-qr-tooltip .qr-desc {
+  font-size: 12px;
+  color: var(--font-color, #4c4948);
+  margin-top: 6px;
+  text-align: center;
+}
+
+.social-qr-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--card-bg, #ffffff);
+}
+
+[data-theme="dark"] .social-qr-tooltip::after {
+  border-top-color: #1e1e24;
+}
+
+.card-info-social-icons .social-icon:hover .social-qr-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
+   关于页专属社交与名片排版 (About Page Custom Glassmorphism)
+   ========================================================================== */
+.custom-about-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  background: rgba(8, 13, 26, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 50px 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+[data-theme="light"] .custom-about-card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.custom-about-card .avatar-container {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  animation: avatar-glow 3s ease-in-out infinite;
+}
+
+[data-theme="light"] .custom-about-card .avatar-container {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+@keyframes avatar-glow {
+  0%, 100% {
+    box-shadow: 0 0 12px 2px rgba(122, 162, 247, 0.3),
+                0 0 24px 4px rgba(139, 92, 246, 0.2),
+                0 0 0 4px rgba(255,255,255,0.06),
+                0 8px 32px rgba(0,0,0,0.45);
+  }
+  50% {
+    box-shadow: 0 0 20px 6px rgba(122, 162, 247, 0.55),
+                0 0 40px 10px rgba(139, 92, 246, 0.35),
+                0 0 0 4px rgba(255,255,255,0.08),
+                0 8px 36px rgba(0,0,0,0.5);
+  }
+}
+
+.custom-about-card .avatar { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
+
+.custom-about-card .about-name { 
+  color: #fff; 
+  font-size: 32px; 
+  margin-bottom: 5px; 
+  font-weight: bold;
+}
+
+[data-theme="light"] .custom-about-card .about-name {
+  color: #333;
+}
+
+.custom-about-card .about-bio { 
+  color: #ccc; 
+  font-size: 15px; 
+  margin-bottom: 28px; 
+}
+
+[data-theme="light"] .custom-about-card .about-bio {
+  color: #666;
+}
+
+.about-social-icons { 
+  display: flex; 
+  gap: 22px; 
+}
+
+.about-social-icons .social-item { 
+  position: relative; 
+  cursor: pointer; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-social-icons .social-item i {
+  font-size: 26px;
+  color: rgba(255, 255, 255, 0.65);
+  transition: color 0.3s, transform 0.3s;
+}
+
+[data-theme="light"] .about-social-icons .social-item i {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.about-social-icons .social-item a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-social-icons .social-item a i {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="light"] .about-social-icons .social-item a i {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.about-social-icons .social-item:hover i { 
+  color: #fff; 
+  transform: scale(1.1);
+}
+
+[data-theme="light"] .about-social-icons .social-item:hover i {
+  color: #49b1f5;
+}
+
+.about-social-icons .qr-tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  width: 140px;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+[data-theme="light"] .about-social-icons .qr-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+}
+
+.about-social-icons .social-item:hover .qr-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.about-social-icons .qr-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.88);
+}
+
+[data-theme="light"] .about-social-icons .qr-tooltip::after {
+  border-top-color: rgba(255, 255, 255, 0.95);
+}
+
+.about-social-icons .qr-tooltip img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Live2D 看板娘微调
+   ========================================================================== */
+#waifu {
+  z-index: 999 !important;
+}
