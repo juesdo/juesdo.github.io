@@ -330,12 +330,12 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 }
 
 /* ==========================================================================
-   全新悬浮毛玻璃页脚与网站统计胶囊徽章 (Floating Glass Footer & Stat Badges)
+   素雅毛玻璃页脚 (Minimal Glassmorphism Footer)
    ========================================================================== */
 #footer {
   background: transparent !important;
-  padding: 10px 20px 40px 20px !important;
-  margin-top: 50px !important;
+  padding: 10px 20px 30px 20px !important;
+  margin-top: 40px !important;
   position: relative;
   z-index: 10;
 }
@@ -345,163 +345,76 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 }
 
 #footer .footer-other {
-  background: rgba(8, 13, 26, 0.65) !important;
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 20px !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
+  background: rgba(8, 13, 26, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
   max-width: 820px !important;
   margin: 0 auto !important;
-  padding: 22px 28px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: 14px !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  padding: 18px 24px !important;
+  text-align: center !important;
+  font-size: 13px !important;
+  line-height: 1.8 !important;
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 
-#footer .footer-other:hover {
-  border-color: rgba(73, 177, 245, 0.4) !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 20px rgba(73, 177, 245, 0.15) !important;
-}
-
-/* 亮色模式适配 */
 [data-theme="light"] #footer .footer-other {
-  background: rgba(255, 255, 255, 0.7) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  color: #555 !important;
 }
 
-[data-theme="light"] #footer .footer-other:hover {
-  border-color: rgba(73, 177, 245, 0.5) !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12) !important;
-}
-
-/* 胶囊徽章排版 */
-.footer_custom_text {
-  order: -1 !important;
-  width: 100%;
-}
-
-.footer-badges {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-}
-
-/* 单个胶囊徽章 */
-.footer-badge {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 30px;
-  padding: 6px 14px;
-  font-size: 13px;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.9);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.footer-badge:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="light"] .footer-badge {
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  color: #333;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-[data-theme="light"] .footer-badge:hover {
-  background: rgba(0, 0, 0, 0.07);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-
-/* 徽章内部小图标与文字样式 */
-.footer-badge .badge-icon {
-  margin-right: 6px;
-  font-size: 14px;
-}
-
-.footer-badge .icon-posts { color: #49b1f5; }
-.footer-badge .icon-pv { color: #2ed573; }
-.footer-badge .icon-uv { color: #a55eea; }
-
-.footer-badge .badge-title {
-  margin-right: 6px;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 12px;
-}
-
-[data-theme="light"] .footer-badge .badge-title {
-  color: rgba(0, 0, 0, 0.55);
-}
-
-.footer-badge .badge-value {
-  font-weight: 600;
-  font-family: 'Fira Code', Consolas, monospace;
-  color: #fff;
-}
-
-[data-theme="light"] .footer-badge .badge-value {
-  color: #111;
-}
-
-/* 动态心跳效果 */
-@keyframes heartBeatAnim {
-  0%, 100% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(1.25);
-  }
-  40% {
-    transform: scale(1);
-  }
-  60% {
-    transform: scale(1.2);
-  }
-}
-
-.beating-heart {
-  color: #ff4757 !important;
-  margin-right: 6px;
-  display: inline-block;
-  animation: heartBeatAnim 1.4s infinite ease-in-out;
-}
-
-/* 底部版权与框架声明美化 */
 #footer .footer-copyright {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7) !important;
-  margin: 0 !important;
+  margin-bottom: 6px !important;
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 
 [data-theme="light"] #footer .footer-copyright {
-  color: rgba(0, 0, 0, 0.6) !important;
+  color: #555 !important;
 }
 
-#footer .footer-copyright a {
+#footer a {
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+#footer a:hover {
   color: #49b1f5 !important;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
 }
 
-#footer .footer-copyright a:hover {
-  background: rgba(73, 177, 245, 0.15);
-  text-decoration: none;
+[data-theme="light"] #footer a {
+  color: #333 !important;
 }
+
+[data-theme="light"] #footer a:hover {
+  color: #49b1f5 !important;
+}
+
+.site-footer-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+[data-theme="light"] .site-footer-data {
+  color: #555;
+}
+
+.site-footer-data .footer-separator {
+  opacity: 0.4;
+  margin: 0 4px;
+}
+
+#site-runtime {
+  font-family: 'Fira Code', Consolas, monospace;
+}
+
 
 
