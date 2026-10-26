@@ -1,12 +1,12 @@
 /* ==========================================================================
-   Fira Code 等宽代码字体
+   Fira Code 绛夊�浠ｇ爜瀛椾綋
    ========================================================================== */
 code, pre, pre code, .highlight, .highlight code, .codehilite {
   font-family: 'Fira Code', 'Cascadia Code', Consolas, Monaco, 'Courier New', monospace !important;
 }
 
 /* ==========================================================================
-   首页 Hero 轮播壁纸双层平滑过渡 (Hero Wallpaper Carousel)
+   棣栭〉 Hero 杞�挱澹佺焊鍙屽眰骞虫粦杩囨浮 (Hero Wallpaper Carousel)
    ========================================================================== */
 #page-header.full_page {
   position: relative;
@@ -40,7 +40,7 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 }
 
 /* ==========================================================================
-   侧边栏社交二维码悬浮卡片 (Social QR Tooltips)
+   渚ц竟鏍忕ぞ浜や簩缁寸爜鎮�诞鍗＄墖 (Social QR Tooltips)
    ========================================================================== */
 .card-info-social-icons .social-icon {
   position: relative !important;
@@ -108,7 +108,7 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 }
 
 /* ==========================================================================
-   关于页专属社交与名片排版 (About Page Custom Glassmorphism)
+   鍏充簬椤典笓灞炵ぞ浜や笌鍚嶇墖鎺掔増 (About Page Custom Glassmorphism)
    ========================================================================== */
 .custom-about-card {
   display: flex;
@@ -291,13 +291,13 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 }
 
 /* ==========================================================================
-   Live2D 看板娘微调
+   Live2D 鐪嬫澘濞樺井璋�
    ========================================================================== */
 #waifu {
   z-index: 999 !important;
 }
 /* ==========================================================================
-   �鵵����ǩ������ҳ�沣��̬��Ƭ����
+   归档、标签、分类页面玻璃态卡片适配
    ========================================================================== */
 #archive, #tag, #category {
   background: rgba(8, 13, 26, 0.6) !important;
@@ -316,7 +316,7 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
-/* ����������ɫ */
+/* 适配文字颜色 */
 #archive .article-sort-item-title, 
 #archive .article-sort-title,
 #archive .article-sort-item-time time {
@@ -329,4 +329,51 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
   color: #333 !important;
 }
 
-#footer { display: none !important; }
+/* ==========================================================================
+   页脚样式与网站信息美化 (Footer Glassmorphism & Webinfo)
+   ========================================================================== */
+#footer {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  margin-top: 30px;
+}
+
+#footer::before {
+  background: transparent !important;
+}
+
+#footer a {
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: none;
+}
+
+#footer a:hover {
+  color: #49b1f5 !important;
+}
+
+.site-footer-data {
+  margin-top: 8px;
+  font-size: 13px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.site-footer-data .footer-separator {
+  opacity: 0.5;
+}
+
+[data-theme="light"] #footer {
+  color: rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-theme="light"] #footer a {
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="light"] #footer a:hover {
+  color: #49b1f5 !important;
+}
+
