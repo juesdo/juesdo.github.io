@@ -1,0 +1,287 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Java 序列化与反序列化基础及安全机制浅析 | juesdo's Blog</title><meta name="author" content="juesdo"><meta name="copyright" content="juesdo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="0x01 前言1. 什么是序列化与反序列化？  序列化 (Serialization)： 把内存中的 Java 对象转换成“字节序列”（一串 0 和 1）的过程。这就像是把你组装好的立体积木城堡拆解、编号，并整齐地装进盒子里。 反序列化 (Deserialization)： 把字节序列重新恢复成 Java 对象的过程。这就像是打开盒子，照着编号把积木重新拼回那个立体的城堡。  2. 为什么需要它？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 序列化与反序列化基础及安全机制浅析">
+<meta property="og:url" content="https://juesdo.github.io/2026/10/26/%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="juesdo&#39;s Blog">
+<meta property="og:description" content="0x01 前言1. 什么是序列化与反序列化？  序列化 (Serialization)： 把内存中的 Java 对象转换成“字节序列”（一串 0 和 1）的过程。这就像是把你组装好的立体积木城堡拆解、编号，并整齐地装进盒子里。 反序列化 (Deserialization)： 把字节序列重新恢复成 Java 对象的过程。这就像是打开盒子，照着编号把积木重新拼回那个立体的城堡。  2. 为什么需要它？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://juesdo.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-10-26T14:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-26T14:07:04.114Z">
+<meta property="article:author" content="juesdo">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="反序列化">
+<meta property="article:tag" content="网络安全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://juesdo.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Java 序列化与反序列化基础及安全机制浅析",
+  "url": "https://juesdo.github.io/2026/10/26/%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/",
+  "image": "https://juesdo.github.io/img/avatar.jpg",
+  "datePublished": "2026-10-26T14:00:00.000Z",
+  "dateModified": "2026-10-26T14:07:04.114Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "juesdo",
+      "url": "https://juesdo.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://juesdo.github.io/2026/10/26/%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Java 序列化与反序列化基础及安全机制浅析',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap"><link rel="stylesheet" href="/css/custom.css"><meta name="referrer" content="no-referrer" /><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">juesdo's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Java 序列化与反序列化基础及安全机制浅析</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Java 序列化与反序列化基础及安全机制浅析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-26T14:00:00.000Z" title="发表于 2026-10-26 22:00:00">2026-10-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-26T14:07:04.114Z" title="更新于 2026-10-26 22:07:04">2026-10-26</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AE%89%E5%85%A8%E7%A0%94%E7%A9%B6/">安全研究</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h2><h3 id="1-什么是序列化与反序列化？"><a href="#1-什么是序列化与反序列化？" class="headerlink" title="1. 什么是序列化与反序列化？"></a>1. 什么是序列化与反序列化？</h3><hr>
+<ul>
+<li><strong>序列化 (Serialization)：</strong> 把内存中的 Java 对象转换成“字节序列”（一串 0 和 1）的过程。这就像是把你组装好的<strong>立体积木城堡拆解、编号，并整齐地装进盒子里</strong>。</li>
+<li><strong>反序列化 (Deserialization)：</strong> 把字节序列重新恢复成 Java 对象的过程。这就像是<strong>打开盒子，照着编号把积木重新拼回那个立体的城堡</strong>。</li>
+</ul>
+<h3 id="2-为什么需要它？"><a href="#2-为什么需要它？" class="headerlink" title="2. 为什么需要它？"></a>2. 为什么需要它？</h3><hr>
+<ul>
+<li><strong>持久化保存（存档）：</strong> 内存断电即焚。如果你想把游戏里玩家的当前属性（生命值、装备等对象）保存到硬盘上，就需要序列化。</li>
+<li><strong>网络传输：</strong> 网络电缆里只能跑 0 和 1 的字节流，不能直接塞进去一个立体的 Java 对象。所以得先“压扁”（序列化）发送，接收端再“充气”（反序列化）还原。</li>
+</ul>
+<h3 id="3-Java-实现的三大关键点"><a href="#3-Java-实现的三大关键点" class="headerlink" title="3. Java 实现的三大关键点"></a>3. Java 实现的三大关键点</h3><hr>
+<p>要在 Java 中使用这项技术，你需要记住三个核心要素：</p>
+<ul>
+<li><strong><code>Serializable</code> 接口：</strong> 想要被序列化的类，<strong>必须</strong>实现 <code>java.io.Serializable</code> 接口。这是一个神奇的“标记接口”，里面什么方法都没有，纯粹是为了给 Java 虚拟机盖个章，表示“我允许被打包”。</li>
+<li><strong><code>transient</code> 关键字：</strong> 如果对象里有些敏感信息（比如 <code>password</code>）你不想存入硬盘或发到网上，就在这个变量前加 <code>transient</code>，序列化时就会自动跳过它。</li>
+</ul>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/57560915/1792985862731-32cdb8b2-ae69-40dc-89ce-2fb25be7523b.png"></p>
+<ul>
+<li><strong><code>ObjectOutputStream</code> 和 <code>ObjectInputStream</code>：</strong> 这两个流专门用来负责对象的写出和读入。</li>
+</ul>
+<h2 id="0x02-代码展示"><a href="#0x02-代码展示" class="headerlink" title="0x02 代码展示"></a>0x02 代码展示</h2><blockquote>
+<p>实体类：User.java</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.juesdo.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.Serializable;</span><br><span class="line"></span><br><span class="line"><span class="comment">//必须实现 Serializable 接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line"></span><br><span class="line">    <span class="type">public</span> <span class="title function_">User</span><span class="params">()</span>&#123;&#125;</span><br><span class="line">    <span class="type">public</span> <span class="title function_">User</span><span class="params">(String name,<span class="type">int</span> age)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.name=name;</span><br><span class="line">        <span class="built_in">this</span>.age=age;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;User&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;name=&#x27;&quot;</span> + name + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, age=&quot;</span> + age +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>序列化文件：SerializationTest.java</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.juesdo.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectOutputStream;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SerializationTest</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">FilePath</span> <span class="operator">=</span> <span class="string">&quot;user.txt&quot;</span>;</span><br><span class="line">        <span class="type">User</span> <span class="variable">u</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;juesdo&quot;</span>,<span class="number">18</span>);</span><br><span class="line">        <span class="keyword">try</span>(<span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(<span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(FilePath)))&#123;</span><br><span class="line">            oos.writeObject(u); <span class="comment">//将对象写入流</span></span><br><span class="line">            System.out.println(<span class="string">&quot;对象序列化成功&quot;</span>);</span><br><span class="line">        &#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里解释一下为什么要<code>new</code>两次： Java IO 流设计中最核心的思想：<strong>装饰者模式（Decorator Pattern）</strong>。</p>
+<p>简单来说，之所以要 <code>new</code> 两次，是因为 <strong>Java 把“连接”和“加工”这两种功能拆分开了</strong>。我们可以继续用“水管”的比喻来理解，这行代码合并了两步操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第一次 new：建立物理连接（基础水管）</span></span><br><span class="line"><span class="type">FileOutputStream</span> <span class="variable">fos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(filePath);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 第二次 new：增加高级功能（加工滤芯）</span></span><br><span class="line"><span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(fos);</span><br></pre></td></tr></table></figure>
+
+<p><strong><code>FileOutputStream</code>（基础水管 &#x2F; 节点流）：</strong> 唯一的本领就是<strong>跟硬盘上或网络的文件建立物理连接</strong>。但它很笨，只认识最基础的字节（0和1），根本不知道什么是 Java 对象。</p>
+<p><strong><code>ObjectOutputStream</code>（加工滤芯 &#x2F; 处理流）：</strong> 能<strong>把复杂的 Java 对象拆解（序列化）成一长串字节</strong>。但是，它没有能力直接去连接硬盘或者网络。 </p>
+<blockquote>
+<p>反序列化文件：UnserializationTest.java</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.juesdo.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UnserializationTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">FilePath</span> <span class="operator">=</span> <span class="string">&quot;user.txt&quot;</span>;</span><br><span class="line">        <span class="keyword">try</span>(<span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">FileInputStream</span>(FilePath)))&#123;</span><br><span class="line">            <span class="type">User</span> <span class="variable">LoadUser</span> <span class="operator">=</span> (User) ois.readObject();</span><br><span class="line">            System.out.println(LoadUser);</span><br><span class="line">        &#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><hr>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/57560915/1788517475672-d724f87b-08aa-4a94-ac0f-17b3aacba174.png"><!-- 这是一张图片，ocr 内容为： --><br><img src="https://cdn.nlark.com/yuque/0/2026/png/57560915/1788517496283-93eea77f-39b7-4541-b457-dc14ee501bbb.png"></p>
+<p>我们来讲讲<code>transient</code>关键字。上面说了<code>transient</code>标识的成员变量不参与序列化，我们来实操一下</p>
+<p>修改过程和运行结果如图所示</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/57560915/1788518263253-ef187744-b710-4185-90ed-02360edfa9c8.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/57560915/1788518365312-e4967e48-e2b6-4b6d-8d82-5cbeb436c3ff.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/57560915/1788518391042-f5127a53-ed9b-4a67-bb9d-c9e75dc954ee.png"></p>
+<p>上述说的还是关于序列化本身的一些特性，接下来我们讲一讲序列化的安全问题是如何产生的。</p>
+<h2 id="0x03-序列化产生的安全问题"><a href="#0x03-序列化产生的安全问题" class="headerlink" title="0x03 序列化产生的安全问题"></a>0x03 序列化产生的安全问题</h2><hr>
+<h3 id="引例"><a href="#引例" class="headerlink" title="引例"></a>引例</h3><p>序列化和反序列化当中有两个<strong>特别</strong>重要的方法 ———— <code>writeObject</code>和<code>readObject</code>。</p>
+<p>这两个方法可以经过开发者重写，一般序列化的重写都是由于下面这种场景诞生的</p>
+<blockquote>
+<p>举个例子，MyList 这个类定义了一个 arr 数组属性，初始化的数组长度为 100。在实际序列化时如果让 arr 属性参与序列化的话，那么长度为 100 的数组都会被序列化下来，但是我在数组中可能只存放 30 个数组而已，这明显是不可理的，所以这里就要自定义序列化过程，具体的做法是”自定义“以下两个 private 方法：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="type">void</span> <span class="title function_">writeObject</span><span class="params">(java.io.ObjectOutputStream s)</span><span class="keyword">throws</span> java.io.IOException</span><br><span class="line"><span class="keyword">private</span> <span class="type">void</span> <span class="title function_">readObject</span><span class="params">(java.io.ObjectInputStream s)</span><span class="keyword">throws</span> java.io.IOException, ClassNotFoundException</span><br></pre></td></tr></table></figure>
+
+<p>只要服务端反序列数据，客户端传递类的<code>readObject</code>方法中代码会自动执行。</p>
+<blockquote>
+<p>所以从根本上来说，Java 反序列化漏洞与 <code>readObject</code>有关。</p>
+</blockquote>
+<p>这里的自定义<code>readObject()</code>不能理解为“重写”， 如果在该方法上加上 <code>@Override</code> 注解，编译器会直接报错。 因为Java序列化规范规定该方法必须是<code>private</code>方法，而<code>private</code> 方法属于类的私有实现，<strong>既不能被子类继承，也不能被子类重写</strong>。  因此它的底层的运行机制其实是通过反射调用：</p>
+<ul>
+<li>当调用 <code>ois.readObject()</code> 时，底层反序列化引擎会通过反射（Reflection）检查当前正在恢复的类中是否存在上述签名的私有方法。</li>
+<li><strong>如果声明了</strong>：JVM 会绕过常规访问限制，通过反射直接调用类里写好的 <code>readObject</code>。</li>
+<li><strong>如果没有声明</strong>：JVM 会退回使用默认策略（按字节顺序为字段逐一赋值）。</li>
+</ul>
+<hr>
+<h3 id="可能存在安全漏洞的形式"><a href="#可能存在安全漏洞的形式" class="headerlink" title="可能存在安全漏洞的形式"></a>可能存在安全漏洞的形式</h3><h4 id="（1）入口类的readObject直接调用危险方法"><a href="#（1）入口类的readObject直接调用危险方法" class="headerlink" title="（1）入口类的readObject直接调用危险方法"></a>（1）入口类的<code>readObject</code>直接调用危险方法</h4><p>这种情况在开发中不是很常见，我们先跟着代码走一遍，写一段弹计算器的代码，用的依旧是上面的<code>User.java</code>文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.juesdo.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.Serializable;</span><br><span class="line"></span><br><span class="line"><span class="comment">//必须实现 Serializable 接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line"></span><br><span class="line">    <span class="type">public</span> <span class="title function_">User</span><span class="params">()</span>&#123;&#125;</span><br><span class="line">    <span class="type">public</span> <span class="title function_">User</span><span class="params">(String name,<span class="type">int</span> age)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.name=name;</span><br><span class="line">        <span class="built_in">this</span>.age=age;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;User&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;name=&#x27;&quot;</span> + name + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, age=&quot;</span> + age +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">void</span> <span class="title function_">readObject</span><span class="params">(ObjectInputStream ois)</span> <span class="keyword">throws</span> ClassNotFoundException, IOException &#123;</span><br><span class="line">        ois.defaultReadObject();</span><br><span class="line">        Runtime.getRuntime().exec(<span class="string">&quot;calc&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>先运行序列化程序 SerializationTest.java ，再运行反序列化程序 UnserializationTest.java</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/57560915/1788681788297-2987f29f-68ea-4b64-a1ea-cf2dbab7dfce.png"></p>
+<p>这时候就能弹出计算器了，还是有点帅的。但是这种情况很少见。</p>
+<p>接下来出现的利用形式会开始变得比较复杂，下一期再讲。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">反序列化</a><a class="post-meta__tags" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/09/23/welcome/" title="Hello World"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Hello World</div></div><div class="info-2"><div class="info-item-1">经历了些许波折与折腾，这个属于我自己的小站终于初具雏形，正式和大家见面了。🎉 平时有些天马行空的随想和稍微硬核的干货，受限于短视频平台的展现形式（其实主要是实在不想再熬夜剪视频了哈哈😅），不太方便在抖音上直接发布。因此，我决定搭建这方自留地，用文字记录下当下的思考。 在未来的日子里，我会在这里不定期分享一些好玩的折腾经历、新奇的想法，以及日常的踩坑与学习笔记。希望能给各位师傅们带来一点微小的启发与帮助，咱们在技术的道路上一起交流，共勉前行。 山水有相逢，非常欢迎大家随时找我交换友链，常来互相串门！🤝 </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">juesdo</div><div class="author-info-description">一个很菜的web苦手</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/juesdo"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/juesdo" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="/img/qr_wx.jpg" target="_blank" title="微信"><i class="fab fa-weixin"></i></a><a class="social-icon" href="/img/qr_qq.png" target="_blank" title="QQ"><i class="fab fa-qq"></i></a><a class="social-icon" href="/img/qr_douyin.png" target="_blank" title="抖音"><i class="fab fa-tiktok"></i></a><a class="social-icon" href="https://blog.csdn.net/2401_87832825?spm=1000.2115.3001.5343" target="_blank" title="CSDN"><i class="fas fa-blog"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x01-%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">0x01 前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AF%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">1. 什么是序列化与反序列化？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%AE%83%EF%BC%9F"><span class="toc-number">1.2.</span> <span class="toc-text">2. 为什么需要它？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Java-%E5%AE%9E%E7%8E%B0%E7%9A%84%E4%B8%89%E5%A4%A7%E5%85%B3%E9%94%AE%E7%82%B9"><span class="toc-number">1.3.</span> <span class="toc-text">3. Java 实现的三大关键点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x02-%E4%BB%A3%E7%A0%81%E5%B1%95%E7%A4%BA"><span class="toc-number">2.</span> <span class="toc-text">0x02 代码展示</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">2.1.</span> <span class="toc-text">运行结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x03-%E5%BA%8F%E5%88%97%E5%8C%96%E4%BA%A7%E7%94%9F%E7%9A%84%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">0x03 序列化产生的安全问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E4%BE%8B"><span class="toc-number">3.1.</span> <span class="toc-text">引例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E8%83%BD%E5%AD%98%E5%9C%A8%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E%E7%9A%84%E5%BD%A2%E5%BC%8F"><span class="toc-number">3.2.</span> <span class="toc-text">可能存在安全漏洞的形式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E5%85%A5%E5%8F%A3%E7%B1%BB%E7%9A%84readObject%E7%9B%B4%E6%8E%A5%E8%B0%83%E7%94%A8%E5%8D%B1%E9%99%A9%E6%96%B9%E6%B3%95"><span class="toc-number">3.2.1.</span> <span class="toc-text">（1）入口类的readObject直接调用危险方法</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/10/26/%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80/" title="Java 序列化与反序列化基础及安全机制浅析">Java 序列化与反序列化基础及安全机制浅析</a><time datetime="2026-10-26T14:00:00.000Z" title="发表于 2026-10-26 22:00:00">2026-10-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/23/welcome/" title="Hello World">Hello World</a><time datetime="2026-09-23T11:20:00.000Z" title="发表于 2026-09-23 19:20:00">2026-09-23</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><div class="js-pjax"></div><script src="/js/hero_bg.js"></script><script src="https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
