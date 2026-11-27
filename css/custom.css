@@ -299,7 +299,9 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 /* ==========================================================================
    归档、标签、分类页面玻璃态卡片适配
    ========================================================================== */
-#archive, #tag, #category {
+#archive, #tag, #category,
+#page:has(.tag-cloud-list),
+#page:has(.category-lists) {
   background: rgba(8, 13, 26, 0.6) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -310,22 +312,44 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 
 [data-theme="light"] #archive,
 [data-theme="light"] #tag,
-[data-theme="light"] #category {
+[data-theme="light"] #category,
+[data-theme="light"] #page:has(.tag-cloud-list),
+[data-theme="light"] #page:has(.category-lists) {
   background: rgba(255, 255, 255, 0.6) !important;
   border: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
 /* 适配文字颜色 */
-#archive .article-sort-item-title, 
+#archive .article-sort-item-title,
 #archive .article-sort-title,
-#archive .article-sort-item-time time {
+#archive .article-sort-item-time time,
+#tag .article-sort-item-title,
+#tag .article-sort-title,
+#tag .article-sort-item-time time,
+#category .article-sort-item-title,
+#category .article-sort-title,
+#category .article-sort-item-time time,
+#page:has(.tag-cloud-list) .page-title,
+#page:has(.category-lists) .page-title,
+#page:has(.category-lists) .category-list-link,
+#page:has(.category-lists) .category-list-count {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-[data-theme="light"] #archive .article-sort-item-title, 
+[data-theme="light"] #archive .article-sort-item-title,
 [data-theme="light"] #archive .article-sort-title,
-[data-theme="light"] #archive .article-sort-item-time time {
+[data-theme="light"] #archive .article-sort-item-time time,
+[data-theme="light"] #tag .article-sort-item-title,
+[data-theme="light"] #tag .article-sort-title,
+[data-theme="light"] #tag .article-sort-item-time time,
+[data-theme="light"] #category .article-sort-item-title,
+[data-theme="light"] #category .article-sort-title,
+[data-theme="light"] #category .article-sort-item-time time,
+[data-theme="light"] #page:has(.tag-cloud-list) .page-title,
+[data-theme="light"] #page:has(.category-lists) .page-title,
+[data-theme="light"] #page:has(.category-lists) .category-list-link,
+[data-theme="light"] #page:has(.category-lists) .category-list-count {
   color: #333 !important;
 }
 
