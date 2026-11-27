@@ -1,12 +1,11 @@
 (function () {
   'use strict';
 
-  // 9 张轮播壁纸素材
+  // 8 张轮播壁纸素材
   const bgImages = [
     '/img/bg/1779330249449.png',
     '/img/bg/1779330254465.png',
     '/img/bg/1779330264551.png',
-    '/img/bg/17793315412.png',
     '/img/bg/1779331884054.png',
     '/img/bg/1779331935933.png',
     '/img/bg/1779331940722.png',
