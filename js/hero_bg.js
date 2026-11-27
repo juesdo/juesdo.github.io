@@ -15,59 +15,129 @@
 
   const BG_INTERVAL = 8000;
   const BG_TRANSITION = 1500;
+  const PRELOAD_TIMEOUT = 15000;
 
   let bgTimer = null;
+  let fadeTimer = null;
+  let runToken = 0;
   let bgActive = 0;
   let bgCurrent = -1;
 
-  function preloadImage(url) {
+  function preloadImage(url, timeoutMs = PRELOAD_TIMEOUT) {
     return new Promise(resolve => {
       const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve();
+      let settled = false;
+
+      const finish = ok => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        img.onload = null;
+        img.onerror = null;
+        resolve(ok);
+      };
+
+      const timer = setTimeout(() => finish(false), timeoutMs);
+
+      img.onload = () => finish(img.naturalWidth > 0);
+      img.onerror = () => finish(false);
       img.src = url;
     });
   }
 
-  function randomBgIndex(exclude) {
-    let idx;
-    do {
-      idx = Math.floor(Math.random() * bgImages.length);
-    } while (idx === exclude && bgImages.length > 1);
-    return idx;
+  function shuffledIndices(excludeIdx) {
+    const indices = [];
+    for (let i = 0; i < bgImages.length; i++) {
+      if (bgImages.length <= 1 || i !== excludeIdx) {
+        indices.push(i);
+      }
+    }
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = indices[i];
+      indices[i] = indices[j];
+      indices[j] = tmp;
+    }
+    return indices;
   }
 
-  async function nextBackground() {
+  async function pickValidImage(excludeIdx) {
+    const candidates = shuffledIndices(excludeIdx);
+    for (const idx of candidates) {
+      const url = bgImages[idx];
+      const ok = await preloadImage(url);
+      if (ok) {
+        return { idx, url };
+      }
+    }
+    return null;
+  }
+
+  function clearTimers() {
+    if (bgTimer) {
+      clearTimeout(bgTimer);
+      bgTimer = null;
+    }
+    if (fadeTimer) {
+      clearTimeout(fadeTimer);
+      fadeTimer = null;
+    }
+  }
+
+  function scheduleNext(token) {
+    if (token !== runToken) return;
+    if (bgTimer) {
+      clearTimeout(bgTimer);
+      bgTimer = null;
+    }
+    bgTimer = setTimeout(() => nextBackground(token), BG_INTERVAL);
+  }
+
+  async function nextBackground(token) {
+    if (token !== runToken) return;
     const layer0 = document.getElementById('hero-bg-0');
     const layer1 = document.getElementById('hero-bg-1');
     if (!layer0 || !layer1) return;
 
-    const nextIdx = randomBgIndex(bgCurrent);
-    const inactive = bgActive === 0 ? layer1 : layer0;
-    const active = bgActive === 0 ? layer0 : layer1;
+    const picked = await pickValidImage(bgCurrent);
+    if (token !== runToken) return;
 
-    await preloadImage(bgImages[nextIdx]);
-    inactive.style.backgroundImage = `url('${bgImages[nextIdx]}')`;
+    if (!picked) {
+      scheduleNext(token);
+      return;
+    }
+
+    const active = bgActive === 0 ? layer0 : layer1;
+    const inactive = bgActive === 0 ? layer1 : layer0;
+
+    inactive.style.opacity = '0';
+    active.after(inactive);
+    inactive.style.backgroundImage = `url('${picked.url}')`;
+    void inactive.offsetWidth;
     inactive.style.opacity = '1';
 
-    setTimeout(() => {
+    fadeTimer = setTimeout(() => {
+      fadeTimer = null;
+      if (token !== runToken) return;
       active.style.opacity = '0';
       bgActive = bgActive === 0 ? 1 : 0;
-      bgCurrent = nextIdx;
+      bgCurrent = picked.idx;
+      scheduleNext(token);
     }, BG_TRANSITION);
   }
 
-  function initHeroBackground() {
-    console.log('Hero BG initialized');
+  async function initHeroBackground() {
+    const token = ++runToken;
+    clearTimers();
+
     let container = document.querySelector('#page-header.full_page');
-    let isFixed = false;
 
     if (!container) {
       const path = window.location.pathname;
-      const isFixedPage = path.includes('/about/') || 
-                          path.includes('/link/') || 
-                          path.includes('/archives/') || 
-                          path.includes('/tags/') || 
+      const isFixedPage = path.includes('/about/') ||
+                          path.includes('/link/') ||
+                          path.includes('/archives/') ||
+                          path.includes('/tags/') ||
                           path.includes('/categories/');
       if (isFixedPage) {
         container = document.getElementById('fixed-bg-container');
@@ -84,16 +154,10 @@
           container.style.backgroundColor = 'transparent';
           document.body.appendChild(container);
         }
-        isFixed = true;
       }
     }
 
     if (!container) {
-      console.log('Hero BG: Not homepage, about, or link page.');
-      if (bgTimer) {
-        clearInterval(bgTimer);
-        bgTimer = null;
-      }
       return;
     }
 
@@ -109,30 +173,34 @@
       layer1 = document.createElement('div');
       layer1.id = 'hero-bg-1';
       layer1.className = 'hero-bg-layer';
-      layer1.style.opacity = '0';
-      console.log('Hero BG: Created background layers.');
     }
 
-    if (isFixed) {
-      layer0.style.position = 'absolute';
-      layer1.style.position = 'absolute';
-    } else {
-      layer0.style.position = 'absolute';
-      layer1.style.position = 'absolute';
-    }
+    layer0.style.position = 'absolute';
+    layer1.style.position = 'absolute';
+    layer0.style.opacity = '0';
+    layer1.style.opacity = '0';
 
-    // Move to correct container if not already there
-    if (layer0.parentNode !== container) {
+    if (layer0.parentNode !== container || layer1.parentNode !== container) {
       container.insertBefore(layer1, container.firstChild);
       container.insertBefore(layer0, container.firstChild);
+    } else {
+      layer0.after(layer1);
     }
 
-    bgCurrent = randomBgIndex(-1);
-    layer0.style.backgroundImage = `url('${bgImages[bgCurrent]}')`;
-    layer0.style.opacity = '1';
+    bgActive = 0;
+    bgCurrent = -1;
 
-    if (bgTimer) clearInterval(bgTimer);
-    bgTimer = setInterval(nextBackground, BG_INTERVAL);
+    const picked = await pickValidImage(-1);
+    if (token !== runToken) return;
+
+    if (picked) {
+      layer0.style.backgroundImage = `url('${picked.url}')`;
+      void layer0.offsetWidth;
+      layer0.style.opacity = '1';
+      bgCurrent = picked.idx;
+    }
+
+    scheduleNext(token);
   }
 
   // 侧边栏社交二维码 Tooltip 动态绑定
