@@ -442,3 +442,469 @@ code, pre, pre code, .highlight, .highlight code, .codehilite {
 
 
 
+/* ==========================================================================
+   文章页 Fluid 风格重构 (Fluid-Style Post Layout & Typography)
+   仅作用于 #body-wrap.post，不影响首页及 #body-wrap.page 页面
+   ========================================================================== */
+
+/* 1. 保留非文章页全宽无侧栏布局 */
+#body-wrap.page #aside-content {
+  display: none !important;
+}
+
+#body-wrap.page #content-inner {
+  max-width: 1000px;
+}
+
+#body-wrap.page #content-inner > div:first-child {
+  width: 100% !important;
+}
+
+/* 2. 文章页整体画布背景 */
+body:has(#body-wrap.post),
+#body-wrap.post {
+  background-color: #eeeeee;
+}
+
+[data-theme="dark"] body:has(#body-wrap.post),
+[data-theme="dark"] #body-wrap.post {
+  background-color: #181c27;
+}
+
+/* 3. 全幅顶部 Banner 与居中标题信息 */
+#body-wrap.post #page-header.post-bg {
+  height: 55vh;
+  min-height: 360px;
+  max-height: 520px;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+#body-wrap.post #page-header.post-bg::before {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+#body-wrap.post #page-header #post-info {
+  position: absolute;
+  top: 52%;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  padding: 0 20px;
+}
+
+#body-wrap.post #page-header #post-info .post-title {
+  font-size: 2.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  margin-bottom: 14px;
+  -webkit-line-clamp: unset;
+}
+
+#body-wrap.post #page-header #post-info #post-meta {
+  text-align: center;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+#body-wrap.post #page-header #post-info #post-meta .meta-firstline,
+#body-wrap.post #page-header #post-info #post-meta .meta-secondline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 6px;
+}
+
+#body-wrap.post #page-header #post-info #post-meta a {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+#body-wrap.post #page-header #post-info #post-meta a:hover {
+  color: #30a9de;
+}
+
+@media screen and (max-width: 768px) {
+  #body-wrap.post #page-header.post-bg {
+    height: 44vh;
+    min-height: 300px;
+  }
+
+  #body-wrap.post #page-header #post-info .post-title {
+    font-size: 1.55rem;
+  }
+}
+
+/* 4. 悬浮重叠文章卡片 + 右侧透明粘性目录 */
+#body-wrap.post #content-inner {
+  max-width: 1260px;
+  padding: 0 24px 48px;
+  align-items: flex-start;
+}
+
+#body-wrap.post #post {
+  width: 77%;
+  margin-top: -3.2rem;
+  position: relative;
+  z-index: 3;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 48px 56px !important;
+  box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.16), 0 17px 50px 0 rgba(0, 0, 0, 0.12);
+  border: none;
+}
+
+[data-theme="dark"] #body-wrap.post #post {
+  background: #252d38;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+}
+
+#body-wrap.post #aside-content {
+  width: 23%;
+  padding-left: 24px;
+  margin-top: 1.2rem;
+}
+
+#body-wrap.post #card-toc {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 8px 4px !important;
+}
+
+#body-wrap.post #card-toc .item-headline {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #3c4858;
+  margin-bottom: 10px;
+}
+
+[data-theme="dark"] #body-wrap.post #card-toc .item-headline {
+  color: #c4c6c9;
+}
+
+#body-wrap.post #card-toc .toc-content .toc-link {
+  color: #718096;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  border-left: 2px solid transparent;
+  padding: 3px 10px;
+  background: transparent !important;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+[data-theme="dark"] #body-wrap.post #card-toc .toc-content .toc-link {
+  color: #a7a9ad;
+}
+
+#body-wrap.post #card-toc .toc-content .toc-link:hover {
+  color: #30a9de;
+}
+
+#body-wrap.post #card-toc .toc-content .toc-link.active {
+  color: #30a9de !important;
+  font-weight: 600;
+  border-left-color: #30a9de;
+  background: transparent !important;
+}
+
+@media screen and (max-width: 900px) {
+  #body-wrap.post #content-inner {
+    padding: 0 12px 36px;
+  }
+
+  #body-wrap.post #post {
+    width: 100%;
+    margin-top: -2rem;
+    padding: 28px 20px !important;
+  }
+
+  #body-wrap.post #aside-content {
+    width: 100%;
+    padding-left: 0;
+  }
+}
+
+/* 5. GitHub / Fluid 风格正文排版 */
+#body-wrap.post #article-container {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2c3e50;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container {
+  color: #c4c6c9;
+}
+
+#body-wrap.post #article-container h1,
+#body-wrap.post #article-container h2,
+#body-wrap.post #article-container h3,
+#body-wrap.post #article-container h4,
+#body-wrap.post #article-container h5,
+#body-wrap.post #article-container h6 {
+  color: #1a202c;
+  font-weight: 700;
+  margin-top: 1.85em;
+  margin-bottom: 0.75em;
+  padding-left: 0 !important;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container h1,
+[data-theme="dark"] #body-wrap.post #article-container h2,
+[data-theme="dark"] #body-wrap.post #article-container h3,
+[data-theme="dark"] #body-wrap.post #article-container h4,
+[data-theme="dark"] #body-wrap.post #article-container h5,
+[data-theme="dark"] #body-wrap.post #article-container h6 {
+  color: #e2e8f0;
+}
+
+#body-wrap.post #article-container h1::before,
+#body-wrap.post #article-container h2::before,
+#body-wrap.post #article-container h3::before,
+#body-wrap.post #article-container h4::before,
+#body-wrap.post #article-container h5::before,
+#body-wrap.post #article-container h6::before {
+  display: none !important;
+}
+
+#body-wrap.post #article-container h2 {
+  font-size: 1.55em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid #eaecef;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container h2 {
+  border-bottom-color: #435266;
+}
+
+#body-wrap.post #article-container h3 {
+  font-size: 1.25em;
+}
+
+#body-wrap.post #article-container h4 {
+  font-size: 1.08em;
+}
+
+#body-wrap.post #article-container a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container a {
+  color: #38bdf8;
+}
+
+#body-wrap.post #article-container a:hover {
+  color: #30a9de;
+  text-decoration: underline;
+}
+
+#body-wrap.post #article-container code:not(pre code) {
+  background: rgba(175, 184, 193, 0.22);
+  color: #24292f;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container code:not(pre code) {
+  background: rgba(99, 110, 123, 0.38);
+  color: #e2e8f0;
+}
+
+#body-wrap.post #article-container figure.highlight {
+  border-radius: 6px;
+  border: 1px solid #eaecef;
+  margin: 1.25rem 0;
+  box-shadow: none;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container figure.highlight {
+  border-color: #364151;
+}
+
+#body-wrap.post #article-container blockquote {
+  border-left: 4px solid #dfe2e5;
+  background: rgba(175, 184, 193, 0.08);
+  color: #5c6b7a;
+  border-radius: 0 6px 6px 0;
+  padding: 12px 18px;
+  margin: 1.25rem 0;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container blockquote {
+  border-left-color: #435266;
+  background: rgba(62, 75, 94, 0.25);
+  color: #a7a9ad;
+}
+
+#body-wrap.post #article-container img {
+  max-width: 92%;
+  height: auto;
+  margin: 1.5rem auto;
+  display: block;
+  border-radius: 6px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.14);
+  cursor: zoom-in;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container img {
+  filter: brightness(0.92);
+}
+
+#body-wrap.post #article-container table {
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+}
+
+#body-wrap.post #article-container table th,
+#body-wrap.post #article-container table td {
+  border: 1px solid #eaecef;
+  padding: 8px 14px;
+}
+
+#body-wrap.post #article-container table th {
+  background: #f6f8fa;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container table th,
+[data-theme="dark"] #body-wrap.post #article-container table td {
+  border-color: #435266;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container table th {
+  background: #1e242d;
+}
+
+#body-wrap.post #article-container hr {
+  border: none;
+  border-top: 1px solid #eaecef;
+  margin: 2rem 0;
+}
+
+#body-wrap.post #article-container hr::before {
+  display: none !important;
+}
+
+[data-theme="dark"] #body-wrap.post #article-container hr {
+  border-top-color: #435266;
+}
+
+/* 6. 文章底部标签与极简上/下一篇导航 */
+#body-wrap.post .tag_share {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #eaecef;
+}
+
+[data-theme="dark"] #body-wrap.post .tag_share {
+  border-top-color: #435266;
+}
+
+#body-wrap.post .post-meta__tags {
+  border-radius: 4px;
+  border: 1px solid #d0d7de;
+  background: transparent;
+  color: #57606a;
+  padding: 2px 10px;
+}
+
+[data-theme="dark"] #body-wrap.post .post-meta__tags {
+  border-color: #435266;
+  color: #a7a9ad;
+}
+
+#body-wrap.post .post-meta__tags:hover {
+  border-color: #30a9de;
+  color: #30a9de;
+  background: transparent;
+}
+
+#body-wrap.post #pagination.pagination-post {
+  background: transparent !important;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #eaecef;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+[data-theme="dark"] #body-wrap.post #pagination.pagination-post {
+  border-top-color: #435266;
+}
+
+#body-wrap.post #pagination.pagination-post .cover,
+#body-wrap.post #pagination.pagination-post .info-2 {
+  display: none !important;
+}
+
+#body-wrap.post #pagination.pagination-post .pagination-related {
+  background: transparent !important;
+  height: auto !important;
+  flex: 1;
+  box-shadow: none !important;
+}
+
+#body-wrap.post #pagination.pagination-post .info {
+  position: static !important;
+  transform: none !important;
+  padding: 6px 4px !important;
+}
+
+#body-wrap.post #pagination.pagination-post .info-item-1 {
+  color: #718096 !important;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+#body-wrap.post #pagination.pagination-post .info-item-2 {
+  color: #2c3e50 !important;
+  font-weight: 600;
+  font-size: 0.98rem;
+  transition: color 0.15s ease;
+}
+
+[data-theme="dark"] #body-wrap.post #pagination.pagination-post .info-item-1 {
+  color: #a7a9ad !important;
+}
+
+[data-theme="dark"] #body-wrap.post #pagination.pagination-post .info-item-2 {
+  color: #c4c6c9 !important;
+}
+
+#body-wrap.post #pagination.pagination-post .pagination-related:hover .info-item-2 {
+  color: #30a9de !important;
+}
+
+/* 7. 文章页页脚柔和适配 */
+#body-wrap.post #footer .footer-other {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+  color: #555 !important;
+}
+
+#body-wrap.post #footer a,
+#body-wrap.post #footer .footer-copyright,
+#body-wrap.post #footer .site-footer-data {
+  color: #555 !important;
+}
+
+[data-theme="dark"] #body-wrap.post #footer .footer-other {
+  background: rgba(37, 45, 56, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+[data-theme="dark"] #body-wrap.post #footer a,
+[data-theme="dark"] #body-wrap.post #footer .footer-copyright,
+[data-theme="dark"] #body-wrap.post #footer .site-footer-data {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
