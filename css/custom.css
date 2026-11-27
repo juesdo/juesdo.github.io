@@ -540,15 +540,21 @@ body:has(#body-wrap.post),
   }
 }
 
-/* 4. 悬浮重叠文章卡片 + 右侧透明粘性目录 */
+/* 4. 悬浮重叠文章卡片 + 对称三栏居中布局（左留白 | 居中正文 | 右侧粘性目录） */
 #body-wrap.post #content-inner {
-  max-width: 1260px;
-  padding: 0 24px 48px;
-  align-items: flex-start;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 860px) minmax(0, 1fr);
+  column-gap: 28px;
+  align-items: stretch;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding: 0 20px 48px !important;
+  box-sizing: border-box;
 }
 
 #body-wrap.post #post {
-  width: 77%;
+  grid-column: 2;
+  width: 100% !important;
   margin-top: -3.2rem;
   position: relative;
   z-index: 3;
@@ -565,9 +571,16 @@ body:has(#body-wrap.post),
 }
 
 #body-wrap.post #aside-content {
-  width: 23%;
-  padding-left: 24px;
-  margin-top: 1.2rem;
+  grid-column: 3;
+  width: 100% !important;
+  max-width: 240px;
+  justify-self: start;
+  padding-left: 0 !important;
+  padding-top: 1.2rem;
+}
+
+#body-wrap.post #aside-content .sticky_layout {
+  top: 76px;
 }
 
 #body-wrap.post #card-toc {
@@ -613,20 +626,39 @@ body:has(#body-wrap.post),
   background: transparent !important;
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1150px) {
   #body-wrap.post #content-inner {
-    padding: 0 12px 36px;
+    display: block !important;
+    max-width: 860px !important;
+    margin: 0 auto !important;
+    padding: 0 16px 40px !important;
   }
 
   #body-wrap.post #post {
-    width: 100%;
-    margin-top: -2rem;
-    padding: 28px 20px !important;
+    width: 100% !important;
   }
 
   #body-wrap.post #aside-content {
-    width: 100%;
-    padding-left: 0;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  #body-wrap.post #card-toc:not(.open) {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  #body-wrap.post #content-inner {
+    padding: 0 12px 36px !important;
+  }
+
+  #body-wrap.post #post {
+    margin-top: -2rem;
+    padding: 28px 20px !important;
   }
 }
 
